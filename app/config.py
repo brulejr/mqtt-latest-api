@@ -7,7 +7,7 @@ from dynaconf import FlaskDynaconf, Validator
 from flask import Flask
 
 
-DEFAULT_CONFIG_LOCATIONS = "/app/app/config,/config,./config,."
+DEFAULT_CONFIG_LOCATIONS = "/app/config,/config,./config,."
 DEFAULT_SETTINGS_FILE_NAMES = ("application.yml", "application.yaml")
 CONFIG_FILE_SUFFIXES = {".yml", ".yaml", ".toml", ".json", ".ini", ".py"}
 
