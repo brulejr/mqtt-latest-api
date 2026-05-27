@@ -4,14 +4,17 @@ import os
 
 from flask import Flask
 
-from app.config import AppConfig
+from app.config import AppConfig, init_config
 from app.mqtt_client import MqttIngestClient
 from app.routes import create_routes
 from app.store import LatestMessageStore
 
 
 def create_app() -> Flask:
-    config = AppConfig.from_env()
+    app = Flask(__name__)
+
+    init_config(app)
+    config = AppConfig.from_flask_config(app.config)
 
     logging.basicConfig(
         level=config.log_level,
@@ -23,8 +26,6 @@ def create_app() -> Flask:
         config.config_profiles,
         config.config_sources,
     )
-
-    app = Flask(__name__)
 
     store = LatestMessageStore(max_items=config.store_max_items)
 

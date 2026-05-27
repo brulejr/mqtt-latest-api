@@ -8,16 +8,24 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Similar to Spring profiles. Supports comma-separated profiles.
+      # Spring-style profile overlay selection. Loads application.yml, then
+      # application-local.yml where present.
       CONFIG_PROFILES: "local"
 
-      # Optional comma-separated files or directories.
-      # Directories load application.yml and application-{profile}.yml.
+      # Optional comma-separated files or directories. Directories load
+      # application.yml/application.yaml and profile overlays.
       CONFIG_LOCATIONS: "/app/app/config,/config"
 
-      # Environment variables still override YAML when supplied.
+      # Canonical FlaskDynaconf overrides use FLASK_ with __ for nesting.
+      # FLASK_MQTT__HOST: "mqtt"
+      # FLASK_MQTT__PORT: "1883"
+      # FLASK_MQTT__TOPICS: '@json ["rtl_433/#", "sensors/#"]'
+      # FLASK_STORE__MAX_ITEMS: "1000"
+      # FLASK_LOGGING__LEVEL: "INFO"
+
+      # Backward-compatible APP_ and legacy variables are still supported.
+      # APP_MQTT__HOST: "mqtt"
       # MQTT_HOST: "mqtt"
-      # MQTT_PORT: "1883"
     volumes:
       # Optional external overrides. Place application.yml and/or
       # application-local.yml in ./config on the host.

@@ -55,6 +55,7 @@ def create_routes(
                 "store_max_items": config.store_max_items,
                 "log_level": config.log_level,
                 "config_profiles": config.config_profiles,
+                "config_locations": config.config_locations,
                 "config_sources": config.config_sources,
             }
         )

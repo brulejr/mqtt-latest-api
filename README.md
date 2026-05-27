@@ -2,16 +2,27 @@
 
 A small Flask application that ingests MQTT JSON messages, keeps only the latest message per discriminator key, and exposes the retained messages through a web API.
 
+The application uses **Dynaconf's Flask extension** (`FlaskDynaconf`) for configuration datafill. `app.config` is the canonical Dynaconf-backed configuration object for the Flask application.
+
+## Why FlaskDynaconf here?
+
+Dynaconf's Flask integration replaces Flask's normal `app.config` object with a Dynaconf-backed config object. That gives the Flask app one canonical configuration source that supports settings files, environment variables, nested values, casting, validation, and extension-friendly access patterns.
+
+This application initializes `FlaskDynaconf` inside the Flask application factory and then creates a small typed `AppConfig` adapter from `app.config` for the MQTT background component.
+
 ## Configuration model
 
 Configuration is loaded in this order:
 
-1. Built-in defaults from the application.
-2. `application.yml` files from configured locations.
-3. `application-{profile}.yml` files from configured locations.
-4. Environment variables.
+1. `application.yml` / `application.yaml` from each configured location.
+2. `application-{profile}.yml` / `application-{profile}.yaml` from each configured location.
+3. Dynaconf Flask environment variables using the `FLASK_` prefix.
+4. Compatibility environment variables using the previous `APP_` prefix.
+5. Legacy convenience environment variables such as `MQTT_HOST` and `MQTT_TOPICS`.
 
-Later sources override earlier sources. This is intentionally similar to Spring Boot's externalized configuration model.
+Later sources override earlier sources.
+
+This keeps the Spring Boot-like profile overlay pattern while using FlaskDynaconf as the application configuration layer.
 
 ## Default config locations
 
@@ -46,6 +57,15 @@ or:
 ```bash
 CONFIG_PROFILES=dev,site1
 ```
+
+For example, with `CONFIG_PROFILES=local`, the app loads:
+
+```text
+application.yml
+application-local.yml
+```
+
+from each configured config location, in order.
 
 ## Selecting config locations
 
@@ -93,9 +113,39 @@ volumes:
   - ./config:/config:ro
 ```
 
-## Environment variable overrides
+## Canonical FlaskDynaconf environment variable overrides
 
-These environment variables override YAML values:
+Use the `FLASK_` prefix and double underscores for nested fields:
+
+```bash
+FLASK_MQTT__HOST=mqtt
+FLASK_MQTT__PORT=1883
+FLASK_MQTT__DISCRIMINATOR_PATH=id
+FLASK_MQTT__FILTER__PATH=model
+FLASK_MQTT__FILTER__VALUE=Acurite-Tower
+FLASK_STORE__MAX_ITEMS=2500
+FLASK_LOGGING__LEVEL=INFO
+```
+
+For list values, use Dynaconf's type casting support:
+
+```bash
+FLASK_MQTT__TOPICS='@json ["rtl_433/#", "sensors/#"]'
+```
+
+## Compatibility environment variables
+
+The prior `APP_` variables are still supported:
+
+```bash
+APP_MQTT__HOST=mqtt
+APP_MQTT__PORT=1883
+APP_MQTT__TOPICS='@json ["rtl_433/#", "sensors/#"]'
+APP_STORE__MAX_ITEMS=2500
+APP_LOGGING__LEVEL=INFO
+```
+
+The original convenience variables are also still supported:
 
 ```text
 MQTT_HOST
@@ -112,7 +162,7 @@ CONFIG_PROFILES
 CONFIG_LOCATIONS
 ```
 
-`MQTT_TOPICS` is comma-separated when supplied as an environment variable:
+`MQTT_TOPICS` is comma-separated when supplied as a legacy environment variable:
 
 ```bash
 MQTT_TOPICS=rtl_433/#,sensors/#
@@ -132,3 +182,7 @@ curl http://localhost:8080/api/latest
 curl http://localhost:8080/api/latest/12345
 curl http://localhost:8080/api/config
 ```
+
+## Operational note
+
+The Dockerfile runs Gunicorn with one worker because the latest-message cache is in memory. If you later need multiple workers or multiple replicas, move the cache to Redis, MongoDB, or another shared backing store.
