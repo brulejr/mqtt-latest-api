@@ -1,0 +1,22 @@
+mqtt:
+  host: localhost
+  port: 1883
+  username:
+  password:
+  topics:
+    - rtl_433/#
+
+  # Field used to identify the logical item whose latest value is retained.
+  # Supports dotted paths such as id, model, device.id, sensor.name.
+  discriminator_path: id
+
+  filter:
+    # Leave path empty/null to accept all messages.
+    path:
+    value:
+
+store:
+  max_items: 1000
+
+logging:
+  level: INFO

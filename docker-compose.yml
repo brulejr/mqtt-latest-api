@@ -8,20 +8,17 @@ services:
     ports:
       - "8080:8080"
     environment:
-      MQTT_HOST: "mqtt"
-      MQTT_PORT: "1883"
-      MQTT_USERNAME: ""
-      MQTT_PASSWORD: ""
-      MQTT_TOPICS: "rtl_433/#"
+      # Similar to Spring profiles. Supports comma-separated profiles.
+      CONFIG_PROFILES: "local"
 
-      # The field used to identify the logical item whose latest value is kept.
-      # Supports dotted paths such as id, model, device.id, sensor.name.
-      MQTT_DISCRIMINATOR_PATH: "id"
+      # Optional comma-separated files or directories.
+      # Directories load application.yml and application-{profile}.yml.
+      CONFIG_LOCATIONS: "/app/app/config,/config"
 
-      # Optional filter.
-      # Leave MQTT_FILTER_PATH empty to accept all messages.
-      MQTT_FILTER_PATH: ""
-      MQTT_FILTER_VALUE: ""
-
-      STORE_MAX_ITEMS: "1000"
-      LOG_LEVEL: "INFO"
+      # Environment variables still override YAML when supplied.
+      # MQTT_HOST: "mqtt"
+      # MQTT_PORT: "1883"
+    volumes:
+      # Optional external overrides. Place application.yml and/or
+      # application-local.yml in ./config on the host.
+      - ./config:/config:ro

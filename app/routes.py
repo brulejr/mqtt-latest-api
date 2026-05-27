@@ -53,6 +53,9 @@ def create_routes(
                 "mqtt_filter_path": config.mqtt_filter_path,
                 "mqtt_filter_value": config.mqtt_filter_value,
                 "store_max_items": config.store_max_items,
+                "log_level": config.log_level,
+                "config_profiles": config.config_profiles,
+                "config_sources": config.config_sources,
             }
         )
 

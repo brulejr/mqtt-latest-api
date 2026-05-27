@@ -18,6 +18,12 @@ def create_app() -> Flask:
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
 
+    logging.getLogger(__name__).info(
+        "Loaded configuration profiles=%s sources=%s",
+        config.config_profiles,
+        config.config_sources,
+    )
+
     app = Flask(__name__)
 
     store = LatestMessageStore(max_items=config.store_max_items)
