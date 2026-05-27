@@ -1,0 +1,12 @@
+mqtt:
+  host: mqtt
+  port: 1883
+  topics:
+    - rtl_433/#
+  discriminator_path: id
+
+store:
+  max_items: 1000
+
+logging:
+  level: DEBUG

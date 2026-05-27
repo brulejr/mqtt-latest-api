@@ -1,0 +1,32 @@
+services:
+  mqtt-latest-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mqtt-latest-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # Spring-style profile overlay selection. Loads application.yml, then
+      # application-local.yml where present.
+      CONFIG_PROFILES: "local"
+
+      # Optional comma-separated files or directories. Directories load
+      # application.yml/application.yaml and profile overlays.
+      CONFIG_LOCATIONS: "/app/app/config,/config"
+
+      # Canonical FlaskDynaconf overrides use FLASK_ with __ for nesting.
+      # FLASK_MQTT__HOST: "mqtt"
+      # FLASK_MQTT__PORT: "1883"
+      # FLASK_MQTT__TOPICS: '@json ["rtl_433/#", "sensors/#"]'
+      # FLASK_STORE__MAX_ITEMS: "1000"
+      # FLASK_LOGGING__LEVEL: "INFO"
+
+      # Backward-compatible APP_ and legacy variables are still supported.
+      # APP_MQTT__HOST: "mqtt"
+      # MQTT_HOST: "mqtt"
+    volumes:
+      # Optional external overrides. Place application.yml and/or
+      # application-local.yml in ./config on the host.
+      - ./config:/config:ro

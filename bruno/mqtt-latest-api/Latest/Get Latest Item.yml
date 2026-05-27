@@ -1,0 +1,19 @@
+info:
+  name: Get Latest Item
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{mqtt_latest_api_url}}/api/latest/:key"
+  params:
+    - name: key
+      value: ABC
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
