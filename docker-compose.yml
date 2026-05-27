@@ -1,0 +1,27 @@
+services:
+  mqtt-latest-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mqtt-latest-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      MQTT_HOST: "mqtt"
+      MQTT_PORT: "1883"
+      MQTT_USERNAME: ""
+      MQTT_PASSWORD: ""
+      MQTT_TOPICS: "rtl_433/#"
+
+      # The field used to identify the logical item whose latest value is kept.
+      # Supports dotted paths such as id, model, device.id, sensor.name.
+      MQTT_DISCRIMINATOR_PATH: "id"
+
+      # Optional filter.
+      # Leave MQTT_FILTER_PATH empty to accept all messages.
+      MQTT_FILTER_PATH: ""
+      MQTT_FILTER_VALUE: ""
+
+      STORE_MAX_ITEMS: "1000"
+      LOG_LEVEL: "INFO"
